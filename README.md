@@ -1,64 +1,93 @@
-#### DBoM Open Source Project Template Instructions
+# Trillian Agent
 
-1. Create a new project based on this template
-3. Update the README, replacing the contents below as prescribed
-3. Delete these instructions and everything up to the _Project Title_ from the README.
+The implementation of an agent that uses trillian as the storage mechanism
 
-
-
-# Project Title
-
-**Description**:  
-
-Put a meaningful, short, plain-language description of what
-this project is trying to accomplish and why it matters.
-Describe the problem(s) this project solves.
-Describe how this software can improve the lives of its audience.
-
-Other things to include:
-
-  - Link to the changelog
-  - Links to production or demo instances
-
-**Screenshot**
-
- If the software has visual components, place a screenshot after the description
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-## Installation
+- [How to Use](#how-to-use)
+  - [API](#api)
+  - [Configuration](#configuration)
+- [Development](#development)
+  - [Regenerate API](#regenerate-api)
+- [Usage](#usage)
+  - [Deploy Trillian](#deploy-trillian)
+  - [Create Master Channel Tree](#create-master-channel-tree)
+- [Helm Deployment](#helm-deployment)
+- [Getting Help](#getting-help)
+- [Getting Involved](#getting-involved)
 
-Detailed instructions on how to install, configure, and get the project running.
-This should be frequently tested to ensure reliability. 
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Configuration
+## How to Use
 
-If the software is configurable, describe it in detail, either here or in other documentation to which you link.
+### API
+
+Latest OpenAPI Specification for this API is available on the [api-specs repository](https://github.com/DBOMproject/api-specs/tree/master/agent)
+
+### Configuration
+
+| Environment Variable         | Default          | Description                                            |
+|------------------------------|------------------|--------------------------------------------------------|
+| LOG_LEVEL                    | `info`           | The verbosity of the logging                           |
+| PORT                         | `5000`           | Port on which the agent listens                        |
+| HOST                         | `0.0.0.0`        | The host address of the agent                          |
+| TRILLIAN_ENDPOINT            | `localhost:8091` | The endpoint of the trillian server connect to         |
+| CHANNEL_CONFIG_MAP_ID        | `0`              | The id of the trillian map to store the channel config |
+| JAEGER_ENABLED               | `false`          | Is jaeger tracing enabled                              |
+| JAEGER_HOST                  | ``               | The jaeger host to send traces to                      |
+| JAEGER_SAMPLER_PARAM         | `1`              | The parameter to pass to the jaeger sampler            |
+| JAEGER_SAMPLER_TYPE          | `const`          | The jaeger sampler type to use                         |
+| JAEGER_SERVICE_NAME          | `Trillian Agent` | The name of the service passed to jaeger               |
+| JAEGER_AGENT_SIDECAR_ENABLED | `false`          | Is jaeger agent sidecar injection enabled              |
+
+
+## Development
+### Regenerate API
+[go-swagger](https://github.com/go-swagger/go-swagger) was used to generate the server api
+
+**Please note: Make sure the trillian agent repository is included in your go path src folder**
+
+```
+swagger generate server -f {path-to-swagger} -A trillian-agent -t={path-to-trillian-repo}
+```
+
+**Please don't make updates to generated files as those changes will be overwritten when the server is regenerated**
 
 ## Usage
+### Deploy Trillian 
+Find the information about to deploy trillian [here](https://github.com/google/trillian/tree/master/deployment)
 
-Show users how to use the software.
-Be specific.
-Use appropriate formatting when showing code snippets.
+**Make sure to install the trillian map server as part of the deployment**
 
-## How to test the software
+### Create Master Channel Tree
+After trillian is deployed, channel config trillian map needs to be created that the trillian agent will use to store channel configurations.
 
-If the software includes automated tests, detail how to run those tests.
+Use the following command to create the tree and set the environmental variable the trillian agent will use
 
+**Make sure to save the the map id as it will be needed for the deployment**
 
-## Getting help
+```
+GRPC="8091"
+CHANNEL_CONFIG_MAP_ID=$(\
+go run github.com/google/trillian/cmd/createtree \
+--admin_server=:${GRPC} \
+--tree_type=MAP \
+--description='Trillian Agent Channel Config' \
+--display_name='TrillAgentChanConf' \
+--hash_strategy=CONIKS_SHA512_256) && echo ${CHANNEL_CONFIG_MAP_ID}
+```
+### Helm Deployment
 
-If you have any queries on insert-project-name, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md) 
+Instructions for deploying the trillian-agent using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/trillian-agent)
 
-**Example**
+## Getting Help
 
-If you have questions, concerns, bug reports, etc, please file an issue in this repository's Issue Tracker.
+If you have any queries on trillian-agent, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md)
 
-## Getting involved
+If you have questions, concerns, bug reports, etc, please file an issue in this repository's [issue tracker](https://github.com/DBOMproject/trillian-agent/issues).
 
-This section should detail why people should get involved and describe key areas you are
-currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building
-important pieces, etc.
+## Getting Involved
 
-General instructions on _how_ to contribute should be stated with a link to [CONTRIBUTING](CONTRIBUTING.md).
-
-
+Find instructions on how you can contribute in [CONTRIBUTING](CONTRIBUTING.md).
