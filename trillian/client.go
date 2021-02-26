@@ -32,6 +32,7 @@ import (
 )
 
 var clientLogger = logger.GetLogger("Trillian:Client")
+var verifySignedMapRoot = tclient.MapVerifier.VerifySignedMapRoot
 
 // Client is a type that represents a Trillian Map Write Client
 type Client struct {
@@ -98,7 +99,7 @@ func (c *MapClient) GetByRevison(ctx context.Context, indexes [][]byte, revison 
 		return nil, nil, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
@@ -135,7 +136,7 @@ func (c *MapClient) Get(ctx context.Context, indexes [][]byte, tracer opentracin
 		return nil, nil, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
@@ -162,7 +163,7 @@ func (c *MapClient) GetCurrentRevison(ctx context.Context, mapID int64, tracer o
 		return 0, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
