@@ -30,8 +30,8 @@ type trillianMapWriteClientMock struct {
 	writeLeavesError bool
 }
 
-func NewTrillianMapWriteMockClient(cc grpc.ClientConnInterface) trillian.TrillianMapWriteClient {
-	return &trillianMapWriteClientMock{}
+func NewTrillianMapWriteMockClient(cc grpc.ClientConnInterface, getLeavesError bool, writeLeavesError bool) trillian.TrillianMapWriteClient {
+	return &trillianMapWriteClientMock{getLeavesError, writeLeavesError}
 }
 
 func (c *trillianMapWriteClientMock) GetLeavesByRevision(ctx context.Context, in *trillian.GetMapLeavesByRevisionRequest, opts ...grpc.CallOption) (*trillian.MapLeaves, error) {
