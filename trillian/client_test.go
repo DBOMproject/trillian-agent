@@ -189,7 +189,7 @@ func TestGetByRevision(t *testing.T) {
 	indexes := [][]byte{
 		index,
 	}
-	client.GetByRevison(ctx, indexes, 1, tracer)
+	client.GetByRevision(ctx, indexes, 1, tracer)
 }
 func TestGetByRevisionError(t *testing.T) {
 	getLeavesError = true
@@ -213,7 +213,7 @@ func TestGetByRevisionError(t *testing.T) {
 	indexes := [][]byte{
 		index,
 	}
-	_, _, err := client.GetByRevison(ctx, indexes, 1, tracer)
+	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
 func TestGetByRevisionErrorRoot(t *testing.T) {
@@ -238,7 +238,7 @@ func TestGetByRevisionErrorRoot(t *testing.T) {
 	indexes := [][]byte{
 		index,
 	}
-	_, _, err := client.GetByRevison(ctx, indexes, 1, tracer)
+	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
 func TestGetByRevisionErrorVerify(t *testing.T) {
@@ -263,7 +263,7 @@ func TestGetByRevisionErrorVerify(t *testing.T) {
 	indexes := [][]byte{
 		index,
 	}
-	_, _, err := client.GetByRevison(ctx, indexes, 1, tracer)
+	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
 func TestGetRevision(t *testing.T) {
@@ -284,7 +284,7 @@ func TestGetRevision(t *testing.T) {
 	assert.Equal(t, true, true)
 	hasher := sha256.New()
 	hasher.Write([]byte("1"))
-	client.GetCurrentRevison(ctx, 1, tracer)
+	client.GetCurrentRevision(ctx, 1, tracer)
 }
 func TestGetRevisionErrorRoot(t *testing.T) {
 	getLeavesError = false
@@ -304,7 +304,7 @@ func TestGetRevisionErrorRoot(t *testing.T) {
 	assert.Equal(t, true, true)
 	hasher := sha256.New()
 	hasher.Write([]byte("1"))
-	_, err := client.GetCurrentRevison(ctx, 1, tracer)
+	_, err := client.GetCurrentRevision(ctx, 1, tracer)
 	assert.Error(t, err)
 }
 func TestGetRevisionErrorVerify(t *testing.T) {
@@ -325,7 +325,7 @@ func TestGetRevisionErrorVerify(t *testing.T) {
 	assert.Equal(t, true, true)
 	hasher := sha256.New()
 	hasher.Write([]byte("1"))
-	_, err := client.GetCurrentRevison(ctx, 1, tracer)
+	_, err := client.GetCurrentRevision(ctx, 1, tracer)
 	assert.Error(t, err)
 }
 
@@ -442,12 +442,12 @@ func (c *trillianMapMockClient) GetSignedMapRootByRevision(ctx context.Context, 
 }
 
 func (c *trillianMapMockClient) InitMap(ctx context.Context, in *trillian.InitMapRequest, opts ...grpc.CallOption) (*trillian.InitMapResponse, error) {
-	out := new(trillian.InitMapResponse)
+	/*out := new(trillian.InitMapResponse)
 	err := c.cc.Invoke(ctx, "/trillian.TrillianMap/InitMap", in, out, opts...)
 	if err != nil {
 		return nil, err
-	}
-	return out, nil
+	}*/
+	return nil, nil
 }
 
 func verifyMock(c tclient.MapVerifier, smr *trillian.SignedMapRoot) (*types.MapRootV1, error) {

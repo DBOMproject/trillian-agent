@@ -38,6 +38,11 @@ import (
 
 var channelLogger = logger.GetLogger("DBoM:Channel")
 
+var add = (*client.Client).Add
+var getByRevision = (*client.MapClient).GetByRevision
+var get = (*client.MapClient).Get
+var getCurrentRevision = (*client.MapClient).GetCurrentRevision
+
 // CreateChannel creates a channel and writes it to trillian
 func CreateChannel(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, trillMapWriteClient trillian.TrillianMapWriteClient, revision int64, channelMapID int64, channelID string, tracer opentracing.Tracer) (int64, error) {
 	channelLogger.Info().Msg("[DBoM:CreateChannel] Entered")
@@ -90,7 +95,7 @@ func CreateChannel(ctx context.Context, trillAdminClient trillian.TrillianAdminC
 		LeafValue: val,
 	}
 	leaves[0] = leaf
-	err = client.Add(ctx, leaves, revision, tracer)
+	err = add(client, ctx, leaves, revision, tracer)
 	if err != nil {
 		tracing.LogAndTraceErr(channelLogger, span, err, responses.InternalError)
 		return -1, err
@@ -111,7 +116,7 @@ func GetChannel(ctx context.Context, client *client.MapClient, channelID string,
 	indexes := [][]byte{
 		index,
 	}
-	inclusions, mapRoot, err := client.Get(ctx, indexes, tracer)
+	inclusions, mapRoot, err := get(client, ctx, indexes, tracer)
 	if err != nil {
 		tracing.LogAndTraceErr(channelLogger, span, err, responses.InternalError)
 		return nil, err

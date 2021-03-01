@@ -48,9 +48,9 @@ func CreateRecord(ctx context.Context, client *client.Client, revision int64, pr
 		Timestamp:  &t,
 	}
 	record := models.Record{
-		AuditDefinition: audit,
-		Revison:         revision,
-		PreviousRevison: prevRevision,
+		AuditDefinition:  audit,
+		Revision:         revision,
+		PreviousRevision: prevRevision,
 	}
 
 	leaves := make([]*trillian.MapLeaf, 1)
@@ -94,7 +94,7 @@ func GetRecord(ctx context.Context, client *client.MapClient, recordID string, r
 	var inclusions []*trillian.MapLeafInclusion
 	var err error
 	if revision > 0 {
-		inclusions, _, err = client.GetByRevison(ctx, indexes, revision, tracer)
+		inclusions, _, err = client.GetByRevision(ctx, indexes, revision, tracer)
 	} else {
 		inclusions, _, err = client.Get(ctx, indexes, tracer)
 	}
@@ -118,7 +118,7 @@ func GetRecord(ctx context.Context, client *client.MapClient, recordID string, r
 		tracing.LogAndTraceErr(recordLogger, span, err, responses.InternalError)
 		return nil, err
 	}
-	recordLogger.Debug().Msgf("Retrieved asset %v at revision %v", recordID, result.Revison)
+	recordLogger.Debug().Msgf("Retrieved asset %v at revision %v", recordID, result.Revision)
 
 	recordLogger.Info().Msg("[DBoM:GetRecord] Finished")
 	span.Finish()

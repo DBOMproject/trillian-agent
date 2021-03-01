@@ -123,7 +123,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 		}
 
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+		channelRevision, err := channelMapClient.GetCurrentRevision(ctx, channelConfigMapID, tracer)
 		channelRevision++
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
@@ -156,9 +156,9 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			return responses.ErrAuditResourceNotFound()
 		}
 		var auditRecord = result.AuditDefinition
-		auditRecord.ID = &result.Revison
+		auditRecord.ID = &result.Revision
 		recordList = append(recordList, &auditRecord)
-		rev := result.PreviousRevison
+		rev := result.PreviousRevision
 		for rev > 0 {
 			result, err := dbom.GetRecord(ctx, &mapClient, params.RecordID, rev, tracer)
 			if err != nil {
@@ -169,9 +169,9 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 				return responses.ErrAuditResourceNotFound()
 			}
 			var auditRecord = result.AuditDefinition
-			auditRecord.ID = &result.Revison
+			auditRecord.ID = &result.Revision
 			recordList = append(recordList, &auditRecord)
-			rev = result.PreviousRevison
+			rev = result.PreviousRevision
 		}
 
 		var payload = models.AuditResponseDefinition{
@@ -218,7 +218,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 
 		var channelMapID = int64(0)
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+		channelRevision, err := channelMapClient.GetCurrentRevision(ctx, channelConfigMapID, tracer)
 		channelRevision++
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
@@ -255,7 +255,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 					return responses.ErrCommitInternalServerError(err)
 				}
 				mapClient := client.MapClient{MapClient: mapClientTree}
-				revision, err = mapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+				revision, err = mapClient.GetCurrentRevision(ctx, channelConfigMapID, tracer)
 				if err != nil {
 					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 					return responses.ErrCommitInternalServerError(err)
@@ -304,7 +304,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 				return responses.ErrCommitInternalServerError(err)
 			}
 			mapClient := client.MapClient{MapClient: mapClientTree}
-			revision, err := mapClient.GetCurrentRevison(ctx, channel.MapID, tracer)
+			revision, err := mapClient.GetCurrentRevision(ctx, channel.MapID, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
@@ -319,7 +319,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			}
 			revision++
 			mapWriteClient := client.NewClient(trillMapWriteClient, channel.MapID)
-			err = dbom.CreateRecord(ctx, mapWriteClient, int64(revision), updateResult.Revison, params.ChannelID, params.CommitType, params.Body, tracer)
+			err = dbom.CreateRecord(ctx, mapWriteClient, int64(revision), updateResult.Revision, params.ChannelID, params.CommitType, params.Body, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
@@ -362,7 +362,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			return responses.ErrRetrieveRecordInternalServerError(channelErr)
 		}
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+		channelRevision, err := channelMapClient.GetCurrentRevision(ctx, channelConfigMapID, tracer)
 		channelRevision++
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
