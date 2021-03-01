@@ -110,14 +110,12 @@ func GetRecord(ctx context.Context, client *client.MapClient, recordID string, r
 		return nil, nil
 	}
 
-	recordLogger.Info().Msg(resString)
 	var result models.Record
 	err = result.UnmarshalBinary([]byte(resString))
 	if err != nil {
 		tracing.LogAndTraceErr(recordLogger, span, err, responses.InternalError)
 		return nil, err
 	}
-	recordLogger.Info().Msgf("%v", result)
 	recordLogger.Debug().Msgf("Retrieved asset %v at revision %v", recordID, result.Revision)
 
 	recordLogger.Info().Msg("[DBoM:GetRecord] Finished")
