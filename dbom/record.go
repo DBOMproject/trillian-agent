@@ -68,7 +68,7 @@ func CreateRecord(ctx context.Context, client *client.Client, revision int64, pr
 	}
 	leaves[0] = leaf
 	recordLogger.Debug().Msgf("Adding asset %v at revision %v", *record.ResourceID, revision)
-	err = client.Add(ctx, leaves, revision, tracer)
+	err = add(client, ctx, leaves, revision, tracer)
 	if err != nil {
 		tracing.LogAndTraceErr(recordLogger, span, err, responses.InternalError)
 		return err
@@ -94,16 +94,13 @@ func GetRecord(ctx context.Context, client *client.MapClient, recordID string, r
 	var inclusions []*trillian.MapLeafInclusion
 	var err error
 	if revision > 0 {
-		inclusions, _, err = client.GetByRevision(ctx, indexes, revision, tracer)
+		inclusions, _, err = getByRevision(client, ctx, indexes, revision, tracer)
 	} else {
-		inclusions, _, err = client.Get(ctx, indexes, tracer)
+		inclusions, _, err = get(client, ctx, indexes, tracer)
 	}
 	if err != nil {
 		tracing.LogAndTraceErr(recordLogger, span, err, responses.InternalError)
 		return nil, err
-	} else if len(inclusions) == 0 {
-		tracing.LogAndTraceErr(recordLogger, span, nil, responses.ResourceNotFound)
-		return nil, nil
 	}
 	var resString = string(inclusions[0].GetLeaf().GetLeafValue())
 	//var idString = string(inclusions[0].GetLeaf().GetIndex())
@@ -112,12 +109,15 @@ func GetRecord(ctx context.Context, client *client.MapClient, recordID string, r
 		tracing.LogAndTraceErr(recordLogger, span, nil, responses.ResourceNotFound)
 		return nil, nil
 	}
+
+	recordLogger.Info().Msg(resString)
 	var result models.Record
-	result.UnmarshalBinary([]byte(resString))
+	err = result.UnmarshalBinary([]byte(resString))
 	if err != nil {
 		tracing.LogAndTraceErr(recordLogger, span, err, responses.InternalError)
 		return nil, err
 	}
+	recordLogger.Info().Msgf("%v", result)
 	recordLogger.Debug().Msgf("Retrieved asset %v at revision %v", recordID, result.Revision)
 
 	recordLogger.Info().Msg("[DBoM:GetRecord] Finished")
