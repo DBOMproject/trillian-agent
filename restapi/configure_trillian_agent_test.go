@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"log"
@@ -19,6 +20,86 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestAddRecord(t *testing.T) {
+	getChannelClient = getChannelClientMock
+	getCurrentRevision = getCurrentRevisionMock
+	getChannel = GetChannelMock
+	getRecord = GetRecordMock
+	createRecord = CreateRecordMock
+	swaggerSpec, err := loads.Embedded(SwaggerJSON, FlatSwaggerJSON)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	api := operations.NewTrillianAgentAPI(swaggerSpec)
+	handler := configureAPI(api)
+	assert.Equal(t, true, true)
+	payload := map[string]interface{}{
+		"test": "test",
+	}
+	recordID := "new-record"
+	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
+
+	reqBody, _ := record.MarshalBinary()
+	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	req.Header.Set("commit-type", "CREATE")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+	rr := httptest.NewRecorder()
+
+	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+	// directly and pass in our Request and ResponseRecorder.
+	handler.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
+
+func TestUpdateRecord(t *testing.T) {
+	getChannelClient = getChannelClientMock
+	getCurrentRevision = getCurrentRevisionMock
+	getChannel = GetChannelMock
+	getRecord = GetRecordMock
+	createRecord = CreateRecordMock
+	swaggerSpec, err := loads.Embedded(SwaggerJSON, FlatSwaggerJSON)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	api := operations.NewTrillianAgentAPI(swaggerSpec)
+	handler := configureAPI(api)
+	assert.Equal(t, true, true)
+	payload := map[string]interface{}{
+		"test": "test",
+	}
+	recordID := "test-record"
+	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
+
+	reqBody, _ := record.MarshalBinary()
+	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	req.Header.Set("commit-type", "UPDATE")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+	rr := httptest.NewRecorder()
+
+	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+	// directly and pass in our Request and ResponseRecorder.
+	handler.ServeHTTP(rr, req)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
 
 // Test_main contains tests for the agent config logger
 func TestGetRecord(t *testing.T) {
@@ -621,4 +702,8 @@ func GetRecordMock2(ctx context.Context, client *client.MapClient, recordID stri
 		return &models.Record{Revision: 2, PreviousRevision: 1, AuditDefinition: models.AuditDefinition{Payload: payload}}, nil
 	}
 	return nil, nil
+}
+
+func CreateRecordMock(ctx context.Context, client *client.Client, revision int64, prevRevision int64, channelID string, commitType string, recordDef *models.RecordDefinition, tracer opentracing.Tracer) error {
+	return nil
 }
