@@ -20,7 +20,6 @@ package tracing
 import (
 	"errors"
 	"io"
-	"net"
 	"os"
 	"strconv"
 	"trillian-agent/helpers"
@@ -53,13 +52,6 @@ func SetupGlobalTracer() (tracer opentracing.Tracer, closer io.Closer, err error
 	tracer, closer, err = cfg.NewTracer(
 		config.Logger(logger),
 		config.Metrics(metrics.NullFactory))
-	if err != nil {
-		if _, ok := err.(*net.DNSError); ok {
-			log.Err(err).Msg("DNS Lookup for the Jaeger agent host failed")
-		}
-		return
-	}
-	//opentracing.SetGlobalTracer(tracer)
 	return
 }
 
@@ -80,6 +72,8 @@ func cfgFromEnv() (cfg *config.Configuration, err error) {
 	cfg.Reporter = &config.ReporterConfig{}
 	if helpers.ExistsInEnv(sidecarEnabledVar) {
 		sidecarEnabled, err = strconv.ParseBool(os.Getenv(sidecarEnabledVar))
+		log.Print("---------------------------------------")
+		log.Print(sidecarEnabled)
 		if err != nil {
 			return
 		}
