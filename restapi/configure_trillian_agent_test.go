@@ -13,10 +13,9 @@ import (
 	"trillian-agent/restapi/operations"
 	client "trillian-agent/trillian"
 
-	tclient "github.com/google/trillian/client"
-
 	"github.com/go-openapi/loads"
 	"github.com/google/trillian"
+	tclient "github.com/google/trillian/client"
 	"github.com/opentracing/opentracing-go"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,7 +31,6 @@ func TestAddRecord(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -41,20 +39,16 @@ func TestAddRecord(t *testing.T) {
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -73,7 +67,6 @@ func TestAddRecordInvalidType(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -82,20 +75,16 @@ func TestAddRecordInvalidType(t *testing.T) {
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "BAD")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -114,7 +103,6 @@ func TestAddRecordError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -123,20 +111,16 @@ func TestAddRecordError(t *testing.T) {
 	}
 	recordID := "new-record-error"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -155,7 +139,6 @@ func TestAddRecordGetError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -164,20 +147,16 @@ func TestAddRecordGetError(t *testing.T) {
 	}
 	recordID := "error-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -196,7 +175,6 @@ func TestAddRecordConflictError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -205,20 +183,16 @@ func TestAddRecordConflictError(t *testing.T) {
 	}
 	recordID := "test-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusConflict {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -237,7 +211,6 @@ func TestAddRecordRevError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -251,15 +224,12 @@ func TestAddRecordRevError(t *testing.T) {
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	channelConfigMapID = -1
 	if status := rr.Code; status != http.StatusInternalServerError {
@@ -279,7 +249,6 @@ func TestAddRecordRevError2(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -292,15 +261,12 @@ func TestAddRecordRevError2(t *testing.T) {
 	req, err := http.NewRequest("POST", "/channels/test-channel-bad-map-id/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -318,7 +284,6 @@ func TestAddRecordGetClientError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -327,20 +292,16 @@ func TestAddRecordGetClientError(t *testing.T) {
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -358,7 +319,6 @@ func TestAddRecordGetClientError2(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -367,20 +327,16 @@ func TestAddRecordGetClientError2(t *testing.T) {
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -398,30 +354,24 @@ func TestAddRecordChannelError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	payload := map[string]interface{}{
 		"test": "test",
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/error-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -441,30 +391,24 @@ func TestAddRecordCreateChannel(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	payload := map[string]interface{}{
 		"test": "test",
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/new-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -484,30 +428,24 @@ func TestAddRecordCreateChannelError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	payload := map[string]interface{}{
 		"test": "test",
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/new-channel-error/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "CREATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -526,7 +464,6 @@ func TestUpdateRecord(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -535,20 +472,16 @@ func TestUpdateRecord(t *testing.T) {
 	}
 	recordID := "test-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -567,7 +500,6 @@ func TestUpdateRecordError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -576,20 +508,16 @@ func TestUpdateRecordError(t *testing.T) {
 	}
 	recordID := "update-record-error"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -608,7 +536,6 @@ func TestUpdateRecordGetError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -617,20 +544,16 @@ func TestUpdateRecordGetError(t *testing.T) {
 	}
 	recordID := "error-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -649,7 +572,6 @@ func TestUpdateRecordMissingError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -658,20 +580,16 @@ func TestUpdateRecordMissingError(t *testing.T) {
 	}
 	recordID := "random-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -690,7 +608,6 @@ func TestUpdateRecordMissingChannel(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -699,20 +616,16 @@ func TestUpdateRecordMissingChannel(t *testing.T) {
 	}
 	recordID := "test-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/random-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -731,7 +644,6 @@ func TestUpdateRecordRevError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -744,15 +656,12 @@ func TestUpdateRecordRevError(t *testing.T) {
 	req, err := http.NewRequest("POST", "/channels/test-channel-bad-map-id/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -770,7 +679,6 @@ func TestUpdateRecordGetClientError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
@@ -779,20 +687,16 @@ func TestUpdateRecordGetClientError(t *testing.T) {
 	}
 	recordID := "new-record"
 	record := models.RecordDefinition{RecordID: &recordID, RecordIDPayload: payload}
-
 	reqBody, _ := record.MarshalBinary()
 	req, err := http.NewRequest("POST", "/channels/test-channel/records", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("commit-type", "UPDATE")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -810,20 +714,16 @@ func TestGetRecord(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -841,20 +741,16 @@ func TestGetRecordChannelError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/error-channel/records/test-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -872,20 +768,16 @@ func TestGetRecordChannelNotFound(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/random-channel/records/test-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -903,20 +795,16 @@ func TestGetRecordError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/error-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -934,20 +822,16 @@ func TestGetRecordNotFound(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/random-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -965,20 +849,16 @@ func TestGetRecordGetClientError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -996,20 +876,16 @@ func TestGetRecordGetClientError2(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1027,20 +903,16 @@ func TestAuditRecord(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1058,20 +930,16 @@ func TestAuditRecordChannelError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/error-channel/records/test-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1089,20 +957,16 @@ func TestAuditRecordChannelNotFound(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/random-channel/records/test-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1120,20 +984,16 @@ func TestAuditRecordError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/error-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1151,20 +1011,16 @@ func TestAuditRecordNotFound(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/random-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1182,20 +1038,16 @@ func TestAuditRecord2Error(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/error-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1213,20 +1065,16 @@ func TestAuditRecordNotFound2(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/random-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1244,20 +1092,16 @@ func TestAuditRecordGetClientError(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -1275,53 +1119,43 @@ func TestAuditRecordGetClientError2(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	api := operations.NewTrillianAgentAPI(swaggerSpec)
 	handler := configureAPI(api)
 	assert.Equal(t, true, true)
-
 	req, err := http.NewRequest("GET", "/channels/test-channel/records/test-record/audit", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+
 	rr := httptest.NewRecorder()
 
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, req)
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusNotFound)
 	}
 }
-
 func getChannelClientMock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
-
 	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
-
 func getChannelClientErrorMock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
 	if channelMapID == 1536 {
 		return nil, errors.New("test-error")
 	}
 	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
-
 func getChannelClientError2Mock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
 	if channelMapID != 1536 {
 		return nil, errors.New("test-error")
 	}
 	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
-
 func getCurrentRevisionMock(c *client.MapClient, ctx context.Context, mapID int64, tracer opentracing.Tracer) (uint64, error) {
 	if mapID == -2 || mapID == 321 {
 		return 0, errors.New("test-error")
 	}
 	return uint64(1654), nil
 }
-
 func GetChannelMock(ctx context.Context, client *client.MapClient, channelID string, tracer opentracing.Tracer) (*models.Channel, error) {
 	if channelID == "test-channel" {
 		return &models.Channel{ChannelID: "test-channel", MapID: 1536}, nil
@@ -1332,7 +1166,6 @@ func GetChannelMock(ctx context.Context, client *client.MapClient, channelID str
 	}
 	return nil, nil
 }
-
 func GetRecordMock(ctx context.Context, client *client.MapClient, recordID string, revision int64, tracer opentracing.Tracer) (*models.Record, error) {
 	payload := map[string]interface{}{
 		"test": "test",
@@ -1350,7 +1183,6 @@ func GetRecordMock(ctx context.Context, client *client.MapClient, recordID strin
 	}
 	return nil, nil
 }
-
 func GetRecordMock2(ctx context.Context, client *client.MapClient, recordID string, revision int64, tracer opentracing.Tracer) (*models.Record, error) {
 	payload := map[string]interface{}{
 		"test": "test",
@@ -1374,14 +1206,12 @@ func GetRecordMock2(ctx context.Context, client *client.MapClient, recordID stri
 	}
 	return nil, nil
 }
-
 func CreateRecordMock(ctx context.Context, client *client.Client, revision int64, prevRevision int64, channelID string, commitType string, recordDef *models.RecordDefinition, tracer opentracing.Tracer) error {
 	if *recordDef.RecordID == "new-record-error" || *recordDef.RecordID == "update-record-error" {
 		return errors.New("create-channel-error")
 	}
 	return nil
 }
-
 func CreateChannelMock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, trillMapWriteClient trillian.TrillianMapWriteClient, revision int64, channelMapID int64, channelID string, tracer opentracing.Tracer) (int64, error) {
 	if channelID == "new-channel-error" {
 		return -1, errors.New("create-channel-error")
