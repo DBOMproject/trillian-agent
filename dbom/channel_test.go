@@ -35,6 +35,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TestCreate tests a successful channel create
 func TestCreate(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -47,6 +48,7 @@ func TestCreate(t *testing.T) {
 	CreateChannel(ctx, mock.NewTrillianAdminMockClient(conn, false, false), mock.NewTrillianMapMockClient(conn, false, false, false), nil, 1, 1, "testChannel", tracer)
 }
 
+//TestCreateError tests a error during channel creation
 func TestCreateError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -59,6 +61,7 @@ func TestCreateError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestCreateErrorCreateTree tests a error during tree creation
 func TestCreateErrorCreateTree(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -71,6 +74,7 @@ func TestCreateErrorCreateTree(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestCreateErrorInitMap tests a error during map initialization
 func TestCreateErrorInitMap(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -83,6 +87,7 @@ func TestCreateErrorInitMap(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestGet tests getting a channel successfully
 func TestGet(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -93,13 +98,14 @@ func TestGet(t *testing.T) {
 	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
-	channel, err := GetChannel(ctx, &client.MapClient{mapClientTree}, "test-channel", tracer)
+	channel, err := GetChannel(ctx, &client.MapClient{MapClient: mapClientTree}, "test-channel", tracer)
 	assert.NotNil(t, channel)
 	assert.Equal(t, channel.ChannelID, "test-channel")
 	assert.Equal(t, channel.MapID, int64(1654))
 	assert.Nil(t, err)
 }
 
+//TestGetError tests an error when getting a channel
 func TestGetError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -110,10 +116,11 @@ func TestGetError(t *testing.T) {
 	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
-	_, err := GetChannel(ctx, &client.MapClient{mapClientTree}, "test-channel", tracer)
+	_, err := GetChannel(ctx, &client.MapClient{MapClient: mapClientTree}, "test-channel", tracer)
 	assert.Error(t, err)
 }
 
+//TestGetNoRes tests no response when getting a channel
 func TestGetNoRes(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -124,11 +131,12 @@ func TestGetNoRes(t *testing.T) {
 	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
-	channel, err := GetChannel(ctx, &client.MapClient{mapClientTree}, "test-channel", tracer)
+	channel, err := GetChannel(ctx, &client.MapClient{MapClient: mapClientTree}, "test-channel", tracer)
 	assert.Nil(t, channel)
 	assert.Nil(t, err)
 }
 
+//TestGetBadRes tests a bad response when getting a channel
 func TestGetBadRes(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -139,10 +147,11 @@ func TestGetBadRes(t *testing.T) {
 	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
-	_, err := GetChannel(ctx, &client.MapClient{mapClientTree}, "test-channel", tracer)
+	_, err := GetChannel(ctx, &client.MapClient{MapClient: mapClientTree}, "test-channel", tracer)
 	assert.Error(t, err)
 }
 
+//TestGetChannelClient tests getting a channel client successfully
 func TestGetChannelClient(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -154,6 +163,7 @@ func TestGetChannelClient(t *testing.T) {
 	GetChannelClient(ctx, mock.NewTrillianAdminMockClient(conn, false, false), mock.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
 }
 
+//TestGetChannelClientError tests an error when getting a channel client
 func TestGetChannelClientError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()

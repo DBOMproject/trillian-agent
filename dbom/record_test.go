@@ -35,6 +35,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//TestCreateRecord tests creating a record successfully
 func TestCreateRecord(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -52,6 +53,7 @@ func TestCreateRecord(t *testing.T) {
 	CreateRecord(ctx, client, 2, 1, "test-channel", "CREATE", recordDef, tracer)
 }
 
+//TestCreateRecordError tests an error when creating a record
 func TestCreateRecordError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -68,6 +70,7 @@ func TestCreateRecordError(t *testing.T) {
 	assert.Error(t, CreateRecord(ctx, client, 2, 1, "test-channel", "CREATE", recordDef, tracer))
 }
 
+//TestGetRecord tests getting a record successfully
 func TestGetRecord(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -85,6 +88,7 @@ func TestGetRecord(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+//TestGetRecordByRevision tests getting a record by revision successfully
 func TestGetRecordByRevision(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -102,6 +106,7 @@ func TestGetRecordByRevision(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+//TestGetRecordError tests an error when getting a record
 func TestGetRecordError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -116,6 +121,7 @@ func TestGetRecordError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestGetRecordNoRes tests no response when getting a record
 func TestGetRecordNoRes(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -131,6 +137,7 @@ func TestGetRecordNoRes(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+//TestGetRecordBadRes tests bad response when getting a record
 func TestGetRecordBadRes(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -145,6 +152,7 @@ func TestGetRecordBadRes(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestGetRecordChannelClient tests getting a record client successfully
 func TestGetRecordChannelClient(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -156,6 +164,7 @@ func TestGetRecordChannelClient(t *testing.T) {
 	GetChannelClient(ctx, mock.NewTrillianAdminMockClient(conn, false, false), mock.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
 }
 
+//TestGetRecordChannelClientError tests getting and error when getting a record client
 func TestGetRecordChannelClientError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
