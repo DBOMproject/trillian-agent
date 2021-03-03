@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//TestAddRecord tests successfully creating a record
 func TestAddRecord(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -61,6 +62,7 @@ func TestAddRecord(t *testing.T) {
 	}
 }
 
+//TestAddRecordInvalidType tests invalid commit type
 func TestAddRecordInvalidType(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -100,6 +102,8 @@ func TestAddRecordInvalidType(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAddRecordError tests an error when creating a record
 func TestAddRecordError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -139,6 +143,8 @@ func TestAddRecordError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestAddRecordGetError tests a get record error when creating a record
 func TestAddRecordGetError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -178,7 +184,9 @@ func TestAddRecordGetError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
-func TestUpdateRecordConflictError(t *testing.T) {
+
+//TestAddRecordConflictError tests a record conflict error when creating a record
+func TestAddRecordConflictError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
 	getChannel = GetChannelMock
@@ -218,6 +226,7 @@ func TestUpdateRecordConflictError(t *testing.T) {
 	}
 }
 
+//TestAddRecordRevError tests a get revision error when creating a record
 func TestAddRecordRevError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -259,6 +268,7 @@ func TestAddRecordRevError(t *testing.T) {
 	}
 }
 
+//TestAddRecordRevError2 tests a get revision error when creating a record
 func TestAddRecordRevError2(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -298,6 +308,7 @@ func TestAddRecordRevError2(t *testing.T) {
 	}
 }
 
+//TestAddRecordGetClientError tests a get client error when creating a record
 func TestAddRecordGetClientError(t *testing.T) {
 	getChannelClient = getChannelClientErrorMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -336,6 +347,8 @@ func TestAddRecordGetClientError(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAddRecordGetClientError2 tests a get client error when creating a record
 func TestAddRecordGetClientError2(t *testing.T) {
 	getChannelClient = getChannelClientError2Mock
 	getCurrentRevision = getCurrentRevisionMock
@@ -374,6 +387,8 @@ func TestAddRecordGetClientError2(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAddRecordChannelError tests a get channel error when creating a record
 func TestAddRecordChannelError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -413,6 +428,8 @@ func TestAddRecordChannelError(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestAddRecordCreateChannel tests a create channel success when creating a record
 func TestAddRecordCreateChannel(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -454,6 +471,8 @@ func TestAddRecordCreateChannel(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestAddRecordCreateChannelError tests a create channel error when creating a record
 func TestAddRecordCreateChannelError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -496,6 +515,7 @@ func TestAddRecordCreateChannelError(t *testing.T) {
 	}
 }
 
+//TestUpdateRecord tests successfully updating a record
 func TestUpdateRecord(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -536,6 +556,7 @@ func TestUpdateRecord(t *testing.T) {
 	}
 }
 
+//TestUpdateRecordError tests an error while updating a record
 func TestUpdateRecordError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -575,6 +596,8 @@ func TestUpdateRecordError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestUpdateRecordGetError tests a get record error while updating a record
 func TestUpdateRecordGetError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -614,6 +637,8 @@ func TestUpdateRecordGetError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestUpdateRecordMissingError tests a record not found error while updating a record
 func TestUpdateRecordMissingError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -653,6 +678,8 @@ func TestUpdateRecordMissingError(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestUpdateRecordMissingChannel tests a channel not found error while updating a record
 func TestUpdateRecordMissingChannel(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -692,6 +719,8 @@ func TestUpdateRecordMissingChannel(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestUpdateRecordRevError tests a get revision error while updating a record
 func TestUpdateRecordRevError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -730,6 +759,8 @@ func TestUpdateRecordRevError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestUpdateRecordRevError tests a get client error while updating a record
 func TestUpdateRecordGetClientError(t *testing.T) {
 	getChannelClient = getChannelClientErrorMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -769,7 +800,7 @@ func TestUpdateRecordGetClientError(t *testing.T) {
 	}
 }
 
-// Test_main contains tests for the agent config logger
+//TestGetRecord tests successfully getting a record
 func TestGetRecord(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -799,6 +830,8 @@ func TestGetRecord(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestGetRecordChannelError tests a get channel error while getting a record
 func TestGetRecordChannelError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -828,6 +861,8 @@ func TestGetRecordChannelError(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestGetRecordChannelNotFound tests a get channel not found error while getting a record
 func TestGetRecordChannelNotFound(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -857,6 +892,8 @@ func TestGetRecordChannelNotFound(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestGetRecordError tests a get record error while getting a record
 func TestGetRecordError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -886,6 +923,8 @@ func TestGetRecordError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestGetRecordNotFound tests a get record not found error while getting a record
 func TestGetRecordNotFound(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -915,6 +954,8 @@ func TestGetRecordNotFound(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestGetRecordGetClientError tests a get client error while getting a record
 func TestGetRecordGetClientError(t *testing.T) {
 	getChannelClient = getChannelClientErrorMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -944,6 +985,8 @@ func TestGetRecordGetClientError(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestGetRecordGetClientError2 tests a get client error while getting a record
 func TestGetRecordGetClientError2(t *testing.T) {
 	getChannelClient = getChannelClientError2Mock
 	getCurrentRevision = getCurrentRevisionMock
@@ -974,6 +1017,7 @@ func TestGetRecordGetClientError2(t *testing.T) {
 	}
 }
 
+//TestAuditRecord tests successfully auditing a record
 func TestAuditRecord(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1003,6 +1047,8 @@ func TestAuditRecord(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestAuditRecordChannelError tests a get channel error auditing a record
 func TestAuditRecordChannelError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1032,6 +1078,8 @@ func TestAuditRecordChannelError(t *testing.T) {
 			status, http.StatusOK)
 	}
 }
+
+//TestAuditRecordChannelNotFound tests a get channel  not found error auditing a record
 func TestAuditRecordChannelNotFound(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1061,6 +1109,8 @@ func TestAuditRecordChannelNotFound(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAuditRecordError tests a get record error auditing a record
 func TestAuditRecordError(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1090,6 +1140,8 @@ func TestAuditRecordError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestAuditRecordNotFound tests a get record not found error auditing a record
 func TestAuditRecordNotFound(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1119,6 +1171,8 @@ func TestAuditRecordNotFound(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAuditRecord2Error tests a get record error auditing a record
 func TestAuditRecord2Error(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1148,6 +1202,8 @@ func TestAuditRecord2Error(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+//TestAuditRecordNotFound2 tests a get record not found error auditing a record
 func TestAuditRecordNotFound2(t *testing.T) {
 	getChannelClient = getChannelClientMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1177,6 +1233,8 @@ func TestAuditRecordNotFound2(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAuditRecordGetClientError tests a get client error auditing a record
 func TestAuditRecordGetClientError(t *testing.T) {
 	getChannelClient = getChannelClientErrorMock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1206,6 +1264,8 @@ func TestAuditRecordGetClientError(t *testing.T) {
 			status, http.StatusNotFound)
 	}
 }
+
+//TestAuditRecordGetClientError2 tests a get client error auditing a record
 func TestAuditRecordGetClientError2(t *testing.T) {
 	getChannelClient = getChannelClientError2Mock
 	getCurrentRevision = getCurrentRevisionMock
@@ -1260,10 +1320,6 @@ func getCurrentRevisionMock(c *client.MapClient, ctx context.Context, mapID int6
 		return 0, errors.New("test-error")
 	}
 	return uint64(1654), nil
-}
-
-func getCurrentRevisionErrorMock(c *client.MapClient, ctx context.Context, mapID int64, tracer opentracing.Tracer) (uint64, error) {
-	return 0, errors.New("test-error")
 }
 
 func GetChannelMock(ctx context.Context, client *client.MapClient, channelID string, tracer opentracing.Tracer) (*models.Channel, error) {
