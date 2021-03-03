@@ -21,8 +21,8 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"trillian-agent/mock"
 	"trillian-agent/models"
-	"trillian-agent/test"
 	"trillian-agent/tracing"
 	client "trillian-agent/trillian"
 
@@ -44,7 +44,7 @@ func TestCreateRecord(t *testing.T) {
 	add = addMock
 	assert.Equal(t, true, true)
 
-	client := client.NewClient(test.NewTrillianMapWriteMockClient(conn, false, false), 1651)
+	client := client.NewClient(mock.NewTrillianMapWriteMockClient(conn, false, false), 1651)
 	recID := "test-record"
 
 	recordDef := &models.RecordDefinition{RecordID: &recID}
@@ -60,7 +60,7 @@ func TestCreateRecordError(t *testing.T) {
 
 	add = addErrorMock
 
-	client := client.NewClient(test.NewTrillianMapWriteMockClient(conn, false, true), 1651)
+	client := client.NewClient(mock.NewTrillianMapWriteMockClient(conn, false, true), 1651)
 	recID := "test-record"
 
 	recordDef := &models.RecordDefinition{RecordID: &recID}
@@ -75,7 +75,7 @@ func TestGetRecord(t *testing.T) {
 	ctx := context.Background()
 
 	get = getRecordMock
-	trillMapWriteClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
 	record, err := GetRecord(ctx, &client.MapClient{mapClientTree}, "test-record", 0, tracer)
@@ -92,7 +92,7 @@ func TestGetRecordByRevision(t *testing.T) {
 	ctx := context.Background()
 
 	getByRevision = getRecordByRevisionMock
-	trillMapWriteClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
 	channel, err := GetRecord(ctx, &client.MapClient{mapClientTree}, "test-record", 2, tracer)
@@ -109,7 +109,7 @@ func TestGetRecordError(t *testing.T) {
 	ctx := context.Background()
 
 	get = getErrorMock
-	trillMapWriteClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
 	_, err := GetRecord(ctx, &client.MapClient{mapClientTree}, "test-record", 0, tracer)
@@ -123,7 +123,7 @@ func TestGetRecordNoRes(t *testing.T) {
 	ctx := context.Background()
 
 	get = getNoResMock
-	trillMapWriteClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
 	channel, err := GetRecord(ctx, &client.MapClient{mapClientTree}, "test-record", 0, tracer)
@@ -138,7 +138,7 @@ func TestGetRecordBadRes(t *testing.T) {
 	ctx := context.Background()
 
 	get = getBadResMock
-	trillMapWriteClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapWriteClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	assert.Equal(t, true, true)
 	mapClientTree := &tclient.MapClient{MapVerifier: &tclient.MapVerifier{}, MapID: 1, Conn: trillMapWriteClient}
 	_, err := GetRecord(ctx, &client.MapClient{mapClientTree}, "test-record", 0, tracer)
@@ -153,7 +153,7 @@ func TestGetRecordChannelClient(t *testing.T) {
 
 	get = getMock
 	assert.Equal(t, true, true)
-	GetChannelClient(ctx, test.NewTrillianAdminMockClient(conn, false, false), test.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
+	GetChannelClient(ctx, mock.NewTrillianAdminMockClient(conn, false, false), mock.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
 }
 
 func TestGetRecordChannelClientError(t *testing.T) {
@@ -164,7 +164,7 @@ func TestGetRecordChannelClientError(t *testing.T) {
 
 	get = getMock
 	assert.Equal(t, true, true)
-	_, err := GetChannelClient(ctx, test.NewTrillianAdminMockClient(conn, false, true), test.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
+	_, err := GetChannelClient(ctx, mock.NewTrillianAdminMockClient(conn, false, true), mock.NewTrillianMapMockClient(conn, false, false, false), 651, tracer)
 	assert.Error(t, err)
 }
 

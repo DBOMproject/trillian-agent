@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"trillian-agent/mock"
 	"trillian-agent/models"
 	"trillian-agent/restapi/operations"
-	"trillian-agent/test"
 	client "trillian-agent/trillian"
 
 	tclient "github.com/google/trillian/client"
@@ -1238,21 +1238,21 @@ func TestAuditRecordGetClientError2(t *testing.T) {
 
 func getChannelClientMock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
 
-	return &tclient.MapClient{Conn: test.NewTrillianMapMockClient(nil, false, false, false)}, nil
+	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
 
 func getChannelClientErrorMock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
 	if channelMapID == 1536 {
 		return nil, errors.New("test-error")
 	}
-	return &tclient.MapClient{Conn: test.NewTrillianMapMockClient(nil, false, false, false)}, nil
+	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
 
 func getChannelClientError2Mock(ctx context.Context, trillAdminClient trillian.TrillianAdminClient, trillMapClient trillian.TrillianMapClient, channelMapID int64, tracer opentracing.Tracer) (*tclient.MapClient, error) {
 	if channelMapID != 1536 {
 		return nil, errors.New("test-error")
 	}
-	return &tclient.MapClient{Conn: test.NewTrillianMapMockClient(nil, false, false, false)}, nil
+	return &tclient.MapClient{Conn: mock.NewTrillianMapMockClient(nil, false, false, false)}, nil
 }
 
 func getCurrentRevisionMock(c *client.MapClient, ctx context.Context, mapID int64, tracer opentracing.Tracer) (uint64, error) {

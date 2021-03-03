@@ -22,7 +22,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"testing"
-	"trillian-agent/test"
+	"trillian-agent/mock"
 	"trillian-agent/tracing"
 
 	"github.com/google/trillian"
@@ -42,7 +42,7 @@ func TestAdd(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
 
-	trillMapWriteClient := test.NewTrillianMapWriteMockClient(conn, false, false)
+	trillMapWriteClient := mock.NewTrillianMapWriteMockClient(conn, false, false)
 	assert.Equal(t, true, true)
 	client := NewClient(trillMapWriteClient, 6453)
 	assert.Equal(t, true, true)
@@ -55,7 +55,7 @@ func TestAddError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
 
-	trillMapWriteClient := test.NewTrillianMapWriteMockClient(conn, false, true)
+	trillMapWriteClient := mock.NewTrillianMapWriteMockClient(conn, false, true)
 	assert.Equal(t, true, true)
 	client := NewClient(trillMapWriteClient, 6453)
 	assert.Equal(t, true, true)
@@ -68,7 +68,7 @@ func TestGet(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -90,7 +90,7 @@ func TestGetError(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, true, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, true, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -113,7 +113,7 @@ func TestGetErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, true, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, true, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -136,7 +136,7 @@ func TestGetErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -160,7 +160,7 @@ func TestGetByRevision(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -182,7 +182,7 @@ func TestGetByRevisionError(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, true, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, true, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -205,7 +205,7 @@ func TestGetByRevisionErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, true, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, true, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -228,7 +228,7 @@ func TestGetByRevisionErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -251,7 +251,7 @@ func TestGetRevision(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -269,7 +269,7 @@ func TestGetRevisionErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, true, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, true, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
@@ -288,7 +288,7 @@ func TestGetRevisionErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
-	trillMapClient := test.NewTrillianMapMockClient(conn, false, false, false)
+	trillMapClient := mock.NewTrillianMapMockClient(conn, false, false, false)
 	tracer, _, _ := tracing.SetupGlobalTracer()
 	ctx := context.Background()
 
