@@ -37,7 +37,7 @@ var getLeavesError = false
 var getRootError = false
 var verifyRootError = false
 
-// Test_logAgentConfig contains tests for the agent config logger
+//TestAdd tests successfully adding to the trillian map
 func TestAdd(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -51,6 +51,7 @@ func TestAdd(t *testing.T) {
 	client.Add(ctx, nil, 1, tracer)
 }
 
+//TestAddError tests an error while adding to the trillian map
 func TestAddError(t *testing.T) {
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	defer conn.Close()
@@ -64,6 +65,7 @@ func TestAddError(t *testing.T) {
 	assert.Error(t, client.Add(ctx, nil, 1, tracer))
 }
 
+//TestGet tests successfully getting from the trillian map
 func TestGet(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -86,6 +88,8 @@ func TestGet(t *testing.T) {
 	}
 	client.Get(ctx, indexes, tracer)
 }
+
+//TestGetError tests an error while getting from the trillian map
 func TestGetError(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -109,6 +113,8 @@ func TestGetError(t *testing.T) {
 	_, _, err := client.Get(ctx, indexes, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetErrorRoot tests a root error while getting from the trillian map
 func TestGetErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -132,6 +138,8 @@ func TestGetErrorRoot(t *testing.T) {
 	_, _, err := client.Get(ctx, indexes, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetErrorVerify tests a verify error while getting from the trillian map
 func TestGetErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -156,6 +164,7 @@ func TestGetErrorVerify(t *testing.T) {
 	assert.Error(t, err)
 }
 
+//TestGetByRevision tests successfully getting from the trillian map by revision
 func TestGetByRevision(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -178,6 +187,8 @@ func TestGetByRevision(t *testing.T) {
 	}
 	client.GetByRevision(ctx, indexes, 1, tracer)
 }
+
+//TestGetByRevisionError tests an error while getting from the trillian map by revision
 func TestGetByRevisionError(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -201,6 +212,8 @@ func TestGetByRevisionError(t *testing.T) {
 	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetByRevisionErrorRoot tests a root error while getting from the trillian map by revision
 func TestGetByRevisionErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -224,6 +237,8 @@ func TestGetByRevisionErrorRoot(t *testing.T) {
 	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetByRevisionErrorVerify tests a verify error while getting from the trillian map by revision
 func TestGetByRevisionErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -247,6 +262,8 @@ func TestGetByRevisionErrorVerify(t *testing.T) {
 	_, _, err := client.GetByRevision(ctx, indexes, 1, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetRevision tests successfully getting the revision from the trillian map
 func TestGetRevision(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -265,6 +282,8 @@ func TestGetRevision(t *testing.T) {
 	hasher.Write([]byte("1"))
 	client.GetCurrentRevision(ctx, 1, tracer)
 }
+
+//TestGetRevisionErrorRoot tests a root error while getting the revision from the trillian map
 func TestGetRevisionErrorRoot(t *testing.T) {
 	verifyRootError = false
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
@@ -284,6 +303,8 @@ func TestGetRevisionErrorRoot(t *testing.T) {
 	_, err := client.GetCurrentRevision(ctx, 1, tracer)
 	assert.Error(t, err)
 }
+
+//TestGetRevisionErrorVerify tests a verify error while getting the revision from the trillian map
 func TestGetRevisionErrorVerify(t *testing.T) {
 	verifyRootError = true
 	conn, _ := grpc.Dial("localhost:3000", grpc.WithInsecure())
