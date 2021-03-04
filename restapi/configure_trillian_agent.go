@@ -49,6 +49,12 @@ import (
 //go:generate swagger generate server --target ../../trillian-agent --name TrillianAgent --spec ../../../../api-specs/agent/v2/agent.json --principal interface{}
 
 var configLogger = logger.GetLogger("Restapi:Config")
+var getChannelClient = dbom.GetChannelClient
+var getCurrentRevision = (*client.MapClient).GetCurrentRevision
+var getChannel = dbom.GetChannel
+var getRecord = dbom.GetRecord
+var createRecord = dbom.CreateRecord
+var createChannel = dbom.CreateChannel
 
 var (
 	trillianEndpoint      = helpers.GetEnv("TRILLIAN_ENDPOINT", "localhost:8091")
@@ -116,20 +122,14 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 		}
 		trillMapClient := trillian.NewTrillianMapClient(conn)
 		trillAdminClient := trillian.NewTrillianAdminClient(conn)
-		channelMapClientTree, channelErr := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
+		channelMapClientTree, channelErr := getChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
 		if channelErr != nil {
 			tracing.LogAndTraceErr(apiLogger, span, channelErr, responses.InternalError)
-			return responses.ErrAuditInternalServerError(channelErr)
+			return responses.ErrAuditResourceNotFound()
 		}
 
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
-		channelRevision++
-		if err != nil {
-			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-			return responses.ErrAuditInternalServerError(err)
-		}
-		channel, err := dbom.GetChannel(ctx, &channelMapClient, params.ChannelID, tracer)
+		channel, err := getChannel(ctx, &channelMapClient, params.ChannelID, tracer)
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrRetrieveRecordInternalServerError(err)
@@ -137,17 +137,14 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
 			return responses.ErrRetrieveChannelNotFound()
 		}
-		mapClientTree, err := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
-		if mapClientTree == nil {
-			tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
-			return responses.ErrRetrieveChannelNotFound()
-		} else if err != nil {
+		mapClientTree, err := getChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
+		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-			return responses.ErrRetrieveRecordInternalServerError(err)
+			return responses.ErrAuditResourceNotFound()
 		}
 		mapClient := client.MapClient{MapClient: mapClientTree}
 		var recordList []*models.AuditDefinition
-		result, err := dbom.GetRecord(ctx, &mapClient, params.RecordID, -1, tracer)
+		result, err := getRecord(ctx, &mapClient, params.RecordID, -1, tracer)
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrAuditInternalServerError(err)
@@ -156,11 +153,11 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			return responses.ErrAuditResourceNotFound()
 		}
 		var auditRecord = result.AuditDefinition
-		auditRecord.ID = &result.Revison
+		auditRecord.ID = &result.Revision
 		recordList = append(recordList, &auditRecord)
-		rev := result.PreviousRevison
+		rev := result.PreviousRevision
 		for rev > 0 {
-			result, err := dbom.GetRecord(ctx, &mapClient, params.RecordID, rev, tracer)
+			result, err := getRecord(ctx, &mapClient, params.RecordID, rev, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrAuditInternalServerError(err)
@@ -169,9 +166,9 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 				return responses.ErrAuditResourceNotFound()
 			}
 			var auditRecord = result.AuditDefinition
-			auditRecord.ID = &result.Revison
+			auditRecord.ID = &result.Revision
 			recordList = append(recordList, &auditRecord)
-			rev = result.PreviousRevison
+			rev = result.PreviousRevision
 		}
 
 		var payload = models.AuditResponseDefinition{
@@ -210,21 +207,21 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 		trillMapClient := trillian.NewTrillianMapClient(conn)
 		trillAdminClient := trillian.NewTrillianAdminClient(conn)
 
-		channelMapClientTree, channelErr := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
+		channelMapClientTree, channelErr := getChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
 		if channelErr != nil {
 			tracing.LogAndTraceErr(apiLogger, span, channelErr, responses.InternalError)
-			return responses.ErrCommitInternalServerError(channelErr)
+			return responses.ErrCommitChannelNotFound()
 		}
 
 		var channelMapID = int64(0)
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+		channelRevision, err := getCurrentRevision(&channelMapClient, ctx, channelConfigMapID, tracer)
 		channelRevision++
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrCommitInternalServerError(err)
 		}
-		channel, err := dbom.GetChannel(ctx, &channelMapClient, params.ChannelID, tracer)
+		channel, err := getChannel(ctx, &channelMapClient, params.ChannelID, tracer)
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrCommitInternalServerError(err)
@@ -235,33 +232,26 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			revision := uint64(1)
 			err := error(nil)
 			if channel == nil {
-				channelMapID, err = dbom.CreateChannel(ctx, trillAdminClient, trillMapClient, trillMapWriteClient, int64(channelRevision), channelConfigMapID, params.ChannelID, tracer)
+				channelMapID, err = createChannel(ctx, trillAdminClient, trillMapClient, trillMapWriteClient, int64(channelRevision), channelConfigMapID, params.ChannelID, tracer)
 				if err != nil {
 					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 					return responses.ErrCommitInternalServerError(err)
 				}
 			} else {
-				if err != nil {
-					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-					return responses.ErrRetrieveRecordInternalServerError(err)
-				} else if channel == nil {
-					tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
-					return responses.ErrRetrieveChannelNotFound()
-				}
 				channelMapID = channel.MapID
-				mapClientTree, err := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
+				mapClientTree, err := getChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
 				if err != nil {
 					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-					return responses.ErrCommitInternalServerError(err)
+					return responses.ErrCommitChannelNotFound()
 				}
 				mapClient := client.MapClient{MapClient: mapClientTree}
-				revision, err = mapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
+				revision, err = getCurrentRevision(&mapClient, ctx, channelMapID, tracer)
 				if err != nil {
 					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 					return responses.ErrCommitInternalServerError(err)
 				}
 
-				result, err := dbom.GetRecord(ctx, &mapClient, *params.Body.RecordID, -1, tracer)
+				result, err := getRecord(ctx, &mapClient, *params.Body.RecordID, -1, tracer)
 				if err != nil {
 					tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 					return responses.ErrCommitInternalServerError(err)
@@ -275,7 +265,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 
 			mapWriteClient := client.NewClient(trillMapWriteClient, channelMapID)
 
-			dbom.CreateRecord(ctx, mapWriteClient, int64(revision), 0, params.ChannelID, params.CommitType, params.Body, tracer)
+			err = createRecord(ctx, mapWriteClient, int64(revision), 0, params.ChannelID, params.CommitType, params.Body, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
@@ -288,28 +278,22 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			span.Finish()
 			return &res
 		} else if params.CommitType == UPDATE || params.CommitType == ATTACH || params.CommitType == DETACH || params.CommitType == TRANSFEROUT {
-			if err != nil {
-				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-				return responses.ErrRetrieveRecordInternalServerError(err)
-			} else if channel == nil {
+			if channel == nil {
 				tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
 				return responses.ErrRetrieveChannelNotFound()
 			}
-			mapClientTree, err := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
-			if mapClientTree == nil {
-				tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
-				return responses.ErrCommitChannelNotFound()
-			} else if err != nil {
+			mapClientTree, err := getChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
+			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-				return responses.ErrCommitInternalServerError(err)
+				return responses.ErrCommitChannelNotFound()
 			}
 			mapClient := client.MapClient{MapClient: mapClientTree}
-			revision, err := mapClient.GetCurrentRevison(ctx, channel.MapID, tracer)
+			revision, err := getCurrentRevision(&mapClient, ctx, channel.MapID, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
 			}
-			updateResult, err := dbom.GetRecord(ctx, &mapClient, *params.Body.RecordID, -1, tracer)
+			updateResult, err := getRecord(ctx, &mapClient, *params.Body.RecordID, -1, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
@@ -319,7 +303,7 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			}
 			revision++
 			mapWriteClient := client.NewClient(trillMapWriteClient, channel.MapID)
-			err = dbom.CreateRecord(ctx, mapWriteClient, int64(revision), updateResult.Revison, params.ChannelID, params.CommitType, params.Body, tracer)
+			err = createRecord(ctx, mapWriteClient, int64(revision), updateResult.Revision, params.ChannelID, params.CommitType, params.Body, tracer)
 			if err != nil {
 				tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 				return responses.ErrCommitInternalServerError(err)
@@ -356,19 +340,13 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 		}
 		trillMapClient := trillian.NewTrillianMapClient(conn)
 		trillAdminClient := trillian.NewTrillianAdminClient(conn)
-		channelMapClientTree, channelErr := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
+		channelMapClientTree, channelErr := getChannelClient(ctx, trillAdminClient, trillMapClient, channelConfigMapID, tracer)
 		if channelErr != nil {
 			tracing.LogAndTraceErr(apiLogger, span, channelErr, responses.InternalError)
-			return responses.ErrRetrieveRecordInternalServerError(channelErr)
+			return responses.ErrRetrieveResourceNotFound()
 		}
 		channelMapClient := client.MapClient{MapClient: channelMapClientTree}
-		channelRevision, err := channelMapClient.GetCurrentRevison(ctx, channelConfigMapID, tracer)
-		channelRevision++
-		if err != nil {
-			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-			return responses.ErrRetrieveRecordInternalServerError(err)
-		}
-		channel, err := dbom.GetChannel(ctx, &channelMapClient, params.ChannelID, tracer)
+		channel, err := getChannel(ctx, &channelMapClient, params.ChannelID, tracer)
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrRetrieveRecordInternalServerError(err)
@@ -376,15 +354,13 @@ func configureAPI(api *operations.TrillianAgentAPI) http.Handler {
 			tracing.LogAndTraceErr(apiLogger, span, nil, responses.ChannelNotFound)
 			return responses.ErrRetrieveChannelNotFound()
 		}
-		mapClientTree, err := dbom.GetChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
-		if mapClientTree == nil {
-			return responses.ErrRetrieveChannelNotFound()
-		} else if err != nil {
+		mapClientTree, err := getChannelClient(ctx, trillAdminClient, trillMapClient, channel.MapID, tracer)
+		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
-			return responses.ErrRetrieveRecordInternalServerError(err)
+			return responses.ErrRetrieveResourceNotFound()
 		}
 		mapClient := client.MapClient{MapClient: mapClientTree}
-		result, err := dbom.GetRecord(ctx, &mapClient, params.RecordID, -1, tracer)
+		result, err := getRecord(ctx, &mapClient, params.RecordID, -1, tracer)
 		if err != nil {
 			tracing.LogAndTraceErr(apiLogger, span, err, responses.InternalError)
 			return responses.ErrRetrieveRecordInternalServerError(err)

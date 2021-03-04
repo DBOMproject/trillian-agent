@@ -23,13 +23,13 @@ import "github.com/go-openapi/swag"
 type Record struct {
 	AuditDefinition
 
-	// Revison
+	// Revision
 	// Required: true
-	Revison int64 `json:"revison"`
+	Revision int64 `json:"revision"`
 
-	// Previous Revison
+	// Previous Revision
 	// Required: true
-	PreviousRevison int64 `json:"previousRevison"`
+	PreviousRevision int64 `json:"previousRevision"`
 }
 
 // MarshalBinary interface implementation

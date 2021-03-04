@@ -32,6 +32,7 @@ import (
 )
 
 var clientLogger = logger.GetLogger("Trillian:Client")
+var verifySignedMapRoot = tclient.MapVerifier.VerifySignedMapRoot
 
 // Client is a type that represents a Trillian Map Write Client
 type Client struct {
@@ -73,15 +74,15 @@ func (c *Client) Add(ctx context.Context, leaves []*trillian.MapLeaf, revision i
 	return nil
 }
 
-// GetByRevison is a function that gets leaves for a specific revisions from a Map
-func (c *MapClient) GetByRevison(ctx context.Context, indexes [][]byte, revison int64, tracer opentracing.Tracer) ([]*trillian.MapLeafInclusion, *types.MapRootV1, error) {
-	clientLogger.Info().Msg("[Client:GetByRevison] Entered")
-	span, ctx := opentracing.StartSpanFromContextWithTracer(ctx, tracer, "Client:GetByRevison")
+// GetByRevision is a function that gets leaves for a specific revisions from a Map
+func (c *MapClient) GetByRevision(ctx context.Context, indexes [][]byte, revision int64, tracer opentracing.Tracer) ([]*trillian.MapLeafInclusion, *types.MapRootV1, error) {
+	clientLogger.Info().Msg("[Client:GetByRevision] Entered")
+	span, ctx := opentracing.StartSpanFromContextWithTracer(ctx, tracer, "Client:GetByRevision")
 	clientLogger.Debug().Msg("Get Map Leaves")
 	rqst := &trillian.GetMapLeavesByRevisionRequest{
 		MapId:    c.MapID,
 		Index:    indexes,
-		Revision: revison,
+		Revision: revision,
 	}
 	resp, err := c.Conn.GetLeavesByRevision(ctx, rqst)
 	if err != nil {
@@ -98,15 +99,15 @@ func (c *MapClient) GetByRevison(ctx context.Context, indexes [][]byte, revison 
 		return nil, nil, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
 		return nil, nil, err3
 	}
 
-	clientLogger.Debug().Msgf("[Client:GetByRevison] %+v", resp)
-	clientLogger.Info().Msg("[Client:GetByRevison] Finished")
+	clientLogger.Debug().Msgf("[Client:GetByRevision] %+v", resp)
+	clientLogger.Info().Msg("[Client:GetByRevision] Finished")
 	span.Finish()
 	return resp.GetMapLeafInclusion(), verify, nil
 }
@@ -135,7 +136,7 @@ func (c *MapClient) Get(ctx context.Context, indexes [][]byte, tracer opentracin
 		return nil, nil, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
@@ -148,10 +149,10 @@ func (c *MapClient) Get(ctx context.Context, indexes [][]byte, tracer opentracin
 	return resp.GetMapLeafInclusion(), verify, nil
 }
 
-// GetCurrentRevison gets for the map
-func (c *MapClient) GetCurrentRevison(ctx context.Context, mapID int64, tracer opentracing.Tracer) (uint64, error) {
-	clientLogger.Info().Msg("[Client:GetCurrentRevison] Entered")
-	span, ctx := opentracing.StartSpanFromContextWithTracer(ctx, tracer, "Client:GetCurrentRevison")
+// GetCurrentRevision gets for the map
+func (c *MapClient) GetCurrentRevision(ctx context.Context, mapID int64, tracer opentracing.Tracer) (uint64, error) {
+	clientLogger.Info().Msg("[Client:GetCurrentRevision] Entered")
+	span, ctx := opentracing.StartSpanFromContextWithTracer(ctx, tracer, "Client:GetCurrentRevision")
 	clientLogger.Debug().Msg("Get Map Root")
 	rqst2 := &trillian.GetSignedMapRootRequest{
 		MapId: c.MapID,
@@ -162,15 +163,15 @@ func (c *MapClient) GetCurrentRevison(ctx context.Context, mapID int64, tracer o
 		return 0, err2
 	}
 	clientLogger.Debug().Msg("Verify Map Root")
-	verify, err3 := c.MapVerifier.VerifySignedMapRoot(resp2.GetMapRoot())
+	verify, err3 := verifySignedMapRoot(*c.MapVerifier, resp2.GetMapRoot())
 	clientLogger.Debug().Msgf("%v", verify)
 	if err3 != nil {
 		tracing.LogAndTraceErr(clientLogger, span, err3, responses.InternalError)
 		return 0, err3
 	}
 
-	clientLogger.Debug().Msgf("[Client:GetCurrentRevison] %+v", verify.Revision)
-	clientLogger.Info().Msg("[Client:GetCurrentRevison] Finished")
+	clientLogger.Debug().Msgf("[Client:GetCurrentRevision] %+v", verify.Revision)
+	clientLogger.Info().Msg("[Client:GetCurrentRevision] Finished")
 	span.Finish()
 	return verify.Revision, nil
 }
