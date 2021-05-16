@@ -15,6 +15,7 @@ The implementation of an agent that uses trillian as the storage mechanism
   - [Deploy Trillian](#deploy-trillian)
   - [Create Master Channel Tree](#create-master-channel-tree)
 - [Helm Deployment](#helm-deployment)
+- [Platform Support](#platform-support)
 - [Getting Help](#getting-help)
 - [Getting Involved](#getting-involved)
 
@@ -81,6 +82,10 @@ go run github.com/google/trillian/cmd/createtree \
 ### Helm Deployment
 
 Instructions for deploying the trillian-agent using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/trillian-agent)
+
+## Platform Support
+
+Currently, we provide pre-built container images for linux amd64 and arm64 architectures via our Github Actions Pipeline. Find the images [here](https://hub.docker.com/r/dbomproject/trillian-agent)
 
 ## Getting Help
 
