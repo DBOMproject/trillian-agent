@@ -16,10 +16,10 @@ require (
 	github.com/google/trillian v1.3.11
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/opentracing/opentracing-go v1.2.0
-	github.com/rs/zerolog v1.23.0
+	github.com/rs/zerolog v1.24.0
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible
-	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	google.golang.org/grpc v1.39.0
 )
