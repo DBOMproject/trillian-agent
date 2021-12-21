@@ -1,5 +1,5 @@
 # CI Build
-FROM golang:1.17.0 as builder
+FROM golang:1.17.5 as builder
 
 WORKDIR /trillian-agent
 
