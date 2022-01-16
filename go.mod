@@ -13,7 +13,7 @@ require (
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.3
 	github.com/golang/protobuf v1.5.2
-	github.com/google/trillian v1.3.11
+	github.com/google/trillian v1.4.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/rs/zerolog v1.26.1
