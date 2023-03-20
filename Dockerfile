@@ -14,7 +14,7 @@ RUN go mod download
 # Now add the local Trillian repo, which typically isn't cacheable.
 COPY . .
 # Build the server.
-RUN go get ./cmd/trillian-agent-server
+RUN go build -o /go/bin ./cmd/trillian-agent-server
 
 # Package only executable
 # Make a minimal image.
