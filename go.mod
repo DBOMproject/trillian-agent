@@ -17,9 +17,9 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/rs/zerolog v1.26.1
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.1
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible
-	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
-	google.golang.org/grpc v1.43.0
+	golang.org/x/net v0.8.0
+	google.golang.org/grpc v1.54.0
 )
