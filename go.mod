@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
-	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi v4.1.3+incompatible
 	github.com/go-openapi/errors v0.20.2
 	github.com/go-openapi/loads v0.21.1
 	github.com/go-openapi/runtime v0.21.0
